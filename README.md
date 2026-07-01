@@ -1,4 +1,4 @@
-# Sonara AI: Multi-Genre Lyric Generation Pipeline 🎤⚡
+# Sonara AI: Multi-Genre Lyric Generation Pipeline
 
 Sonara is an end-to-end automated data engineering and fine-tuning pipeline designed to train Large Language Models (LLMs) on high-fidelity, multi-genre lyric generation. 
 
