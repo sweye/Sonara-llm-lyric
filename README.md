@@ -6,7 +6,7 @@ The framework handles everything from dynamic chart-based data ingestion and aut
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
 * **Dynamic Chart Scraping:** Directly interfaces with the Genius API to automatically discover and extract catalogs from top-charting global artists across major musical movements.
 * **Regex Feature Eraser:** A specialized text-processing engine that strips out guest features (e.g., blocks owned by `[Verse 2: Guest Artist]`) while preserving the main artist's target style and neutral structural markers (`[Chorus]`, `[Bridge]`).
