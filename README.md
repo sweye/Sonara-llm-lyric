@@ -1,37 +1,41 @@
-# Sonara AI: Multi-Genre Lyric Generation Pipeline
+# Sonara Lyrics Dataset Pipeline
 
-Sonara is an end-to-end automated data engineering and fine-tuning pipeline designed to train Large Language Models (LLMs) on high-fidelity, multi-genre lyric generation. 
+An automated, robust Python pipeline built to compile high-quality song lyrics across multiple musical pillars (Rap, R&B, Pop, Country, Rock) for LLM fine-tuning and text generation tasks. 
 
-The framework handles everything from dynamic chart-based data ingestion and automated regex feature-stripping to mathematically balanced dataset compilation and fast Supervised Fine-Tuning (SFT) via Unsloth.
+This pipeline combines the official **Genius API** for hyper-accurate metadata extraction with an open-source, multi-provider engine (**syncedlyrics**) to bypass aggressive web-scraping restrictions and Cloudflare walls.
 
 ---
 
 ##  Key Features
 
-* **Dynamic Chart Scraping:** Directly interfaces with the Genius API to automatically discover and extract catalogs from top-charting global artists across major musical movements.
-* **Regex Feature Eraser:** A specialized text-processing engine that strips out guest features (e.g., blocks owned by `[Verse 2: Guest Artist]`) while preserving the main artist's target style and neutral structural markers (`[Chorus]`, `[Bridge]`).
-* **Mathematically Balanced Ingestion:** Prevents dataset "style bias" by enforcing an even 5,000-song split across 5 major parent music pillars, compiling a massive 25,000-track training matrix (~12.5M tokens).
-* **Unsloth & HuggingFace Native:** Formats outputs into clean instruction-response pairs perfectly optimized for accelerated PEFT/LoRA fine-tuning.
+* **Anti-Block Architecture**: Completely avoids web scraping (`beautifulsoup4`, `curl_cffi`, or `cloudscraper`) on high-security domains.
+* **Smart Provider Filtering**: Explicitly isolates high-availability, open-source lyric databases (`Lrclib`, `NetEase`, `Megalobiz`) to completely eliminate `401 Unauthorized` token errors caused by restrictive platforms like Musixmatch.
+* **Automatic LRC Cleansing**: Integrated regex engine strips away synchronized media timestamps (e.g., `[01:23.45]`) instantly, leaving behind pure text paragraphs.
+* **State Preservation & Resumability**: Tracks progress at the artist level and caches intermediate saves to `/content/sonara_lyrics_dataset.json` inside Google Colab, ensuring zero data loss if a network timeout occurs.
+* **Muted Error Logging**: Suppresses unnecessary background library warnings to provide a clean, accurate progress indicator via `tqdm`.
 
 ---
 
-## 📊 Dataset Matrix (25,000 Tracks)
+## 📦 Core Architecture
 
-To capture granular regional movements and sub-genres (like Rage Rap, Philly Drill, Dark Toronto R&B, and Americana) without chart limitations, the pipeline scales across 250 unique artists:
+The dataset generation is executed through a structured cell-based pipeline:
 
-| Parent Tag | Covered Soundscapes | Target Artists | Max Tracks/Artist | Total Songs |
-| :--- | :--- | :---: | :---: | :---: |
-| **`rap`** | Rage, Drill, Jerk, Plugg, Trap, Boom-Bap | 50 | 100 | **5,000** |
-| **`rb`** | Dark Alt-R&B, Trapsoul, Neo-Soul | 50 | 100 | **5,000** |
-| **`pop`** | Synth-Pop, Dance-Pop, Indie Crossovers | 50 | 100 | **5,000** |
-| **`country`**| Arena Country, Americana, Outlaw Country | 50 | 100 | **5,000** |
-| **`rock`** | Emo-Rap, Alt-Rock, Grunge, Modern Punk | 50 | 100 | **5,000** |
+1. **Cell 1**: Environmental configuration and dependencies setup.
+2. **Cell 2 (The Run Engine)**: Resolves your curated artist matrix, queries metadata via Genius, safely extracts plain-text lyrics using alternative pipelines, and builds structural instructional prompts.
+3. **Cell 3**: Model initialization, tokenization, and Parameter-Efficient Fine-Tuning (PEFT/LoRA) setup.
+4. **Cell 4**: SFT Training execution featuring crash-safe checkpointing to Google Drive every 50 steps.
+5. **Cell 5**: Manual weight exporting and merging.
+6. **Cell 6**: Gradio-powered Private Lyrics Dashboard for testing and inference.
 
 ---
 
 ## 🛠️ Installation & Setup
 
-1. Clone the repository:
+Before initializing the runtime engine in **Cell 2**, remove old browser-impersonating scraping scrap and install the modern processing libraries:
+
 ```bash
-git clone [https://github.com/YOUR_USERNAME/sonara-ai.git](https://github.com/YOUR_USERNAME/sonara-ai.git)
-cd sonara-ai
+# Install the core extraction library
+pip install syncedlyrics tqdm requests
+
+# Remove obsolete, blocked scraping dependencies
+pip uninstall cloudscraper curl_cffi beautifulsoup4
